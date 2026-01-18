@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Metal Detector Tycoon - Find rare metals, collect variants, and become the ultimate treasure hunter!">
+    <title>Metal Detector Tycoon</title>
+    <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- Three.js Canvas -->
+        <canvas id="game-canvas"></canvas>
+
+        <!-- HUD Overlay -->
+        <div id="hud">
+            <div id="coins-display">
+                <span class="coin-icon">🪙</span>
+                <span id="coin-count">0</span>
+            </div>
+            <div id="bag-display">
+                <span class="bag-icon">🎒</span>
+                <span id="bag-count">0</span>/<span id="bag-max">10</span>
+            </div>
+            <div id="detector-display">
+                <span class="detector-icon">📡</span>
+                <span id="detector-name">Starter</span>
+            </div>
+        </div>
+
+        <!-- Scanner Info Panel (Advanced Detectors) -->
+        <div id="scanner-info" class="hidden">
+            <div id="scanner-lines"></div>
+            <div id="scanner-variant-alert" class="hidden">✨ VARIANT DETECTED ✨</div>
+        </div>
+
+        <!-- Detection Indicator -->
+        <div id="detection-indicator">
+            <div id="signal-bar"></div>
+            <div id="signal-text">Scanning...</div>
+        </div>
+
+        <!-- Dig Prompt -->
+        <div id="dig-prompt" class="hidden">
+            <div class="prompt-content">
+                <span class="key-hint">HOLD</span>
+                <span class="key">SPACE</span>
+                <span class="key-hint">TO DIG</span>
+            </div>
+            <div id="dig-progress">
+                <div id="dig-progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Item Reveal Modal -->
+        <div id="item-reveal" class="hidden">
+            <div id="reveal-backdrop"></div>
+            <div id="reveal-content">
+                <div id="reveal-rarity-flash"></div>
+                <div id="reveal-item-display">
+                    <div id="reveal-item-icon"></div>
+                </div>
+                <div id="reveal-item-name"></div>
+                <div id="reveal-item-variants"></div>
+                <div id="reveal-item-value">
+                    <span class="coin-icon">🪙</span>
+                    <span id="reveal-value"></span>
+                </div>
+                <button id="reveal-collect-btn">Collect</button>
+            </div>
+        </div>
+
+        <!-- Shop Button -->
+        <button id="shop-btn">
+            <span>🏪</span>
+            <span>Shop</span>
+        </button>
+
+        <!-- Help Button -->
+        <button id="help-btn">
+            <span>❓</span>
+            <span>Help</span>
+        </button>
+
+        <!-- Inventory Button -->
+        <button id="inventory-btn">
+            <span>🎒</span>
+            <span>Bag</span>
+        </button>
+
+        <!-- Shop Modal -->
+        <div id="shop-modal" class="modal hidden">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>🏪 Shop</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-tabs">
+                    <button class="tab-btn active" data-tab="sell">Sell</button>
+                    <button class="tab-btn" data-tab="buy">Buy</button>
+                </div>
+                <div id="sell-tab" class="tab-content active">
+                    <div id="sell-items-list"></div>
+                    <div id="sell-summary">
+                        <span>Total: </span>
+                        <span class="coin-icon">🪙</span>
+                        <span id="sell-total">0</span>
+                    </div>
+                    <button id="sell-all-btn" class="action-btn">Sell All</button>
+                </div>
+                <div id="buy-tab" class="tab-content hidden">
+                    <div id="buy-categories">
+                        <button class="cat-btn active" data-category="detectors">Detectors</button>
+                        <button class="cat-btn" data-category="bags">Bags</button>
+                        <button class="cat-btn" data-category="areas">Areas</button>
+                    </div>
+                    <div id="buy-items-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inventory Modal -->
+        <div id="inventory-modal" class="modal hidden">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>🎒 Bag</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div id="inventory-grid"></div>
+            </div>
+        </div>
+
+        <!-- Help Modal -->
+        <div id="help-modal" class="modal hidden">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>❓ Help & Guide</h2>
+                    <button class="close-btn">&times;</button>
+                </div>
+                <div class="modal-tabs">
+                    <button class="tab-btn active" data-tab="how-to-play">How to Play</button>
+                    <button class="tab-btn" data-tab="encyclopedia">Encyclopedia</button>
+                </div>
+                <div id="how-to-play-tab" class="tab-content active">
+                    <div class="help-section">
+                        <h3>🎮 Controls</h3>
+                        <ul>
+                            <li><strong>Mouse</strong>: Move the detector</li>
+                            <li><strong>Signal</strong>: Watch the bar and listen to beeps</li>
+                            <li><strong>SPACE (Hold)</strong>: Dig when signal is strong</li>
+                        </ul>
+                    </div>
+                    <div class="help-section">
+                        <h3>🏆 Goal</h3>
+                        <p>Find hidden metals, sell them for coins, and upgrade your gear to find rarer items!</p>
+                    </div>
+                    <div class="help-section">
+                        <h3>💡 Tips</h3>
+                        <ul>
+                            <li>Stronger signals mean you are closer.</li>
+                            <li>Upgrade your detector to find deeper and rarer metals.</li>
+                            <li>Bigger bags let you carry more loot.</li>
+                            <li>Unlock new areas for exclusive finds.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div id="encyclopedia-tab" class="tab-content hidden">
+                    <div id="encyclopedia-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div id="notifications"></div>
+    </div>
+
+    <!-- Three.js -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <script type="module" src="src/main.js"></script>
+</body>
+
+</html>
