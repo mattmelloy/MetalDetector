@@ -72,6 +72,11 @@ export class GameManager {
         window.addEventListener('keydown', (e) => this.onKeyDown(e));
         window.addEventListener('keyup', (e) => this.onKeyUp(e));
 
+        // Touch listeners for mobile digging
+        window.addEventListener('touchstart', (e) => this.onTouchStart(e));
+        window.addEventListener('touchend', (e) => this.onTouchEnd(e));
+        window.addEventListener('touchcancel', (e) => this.onTouchEnd(e));
+
         // Auto-save
         setInterval(() => this.save(), 30000);
     }
@@ -117,6 +122,20 @@ export class GameManager {
             this.digProgress = 0;
             this.ui.updateDigProgress(0);
         }
+    }
+
+    // Touch handlers for mobile digging
+    onTouchStart(e) {
+        // Simulate space bar press for digging
+        this.keys['Space'] = true;
+    }
+
+    onTouchEnd(e) {
+        // Simulate space bar release
+        this.keys['Space'] = false;
+        this.isDigging = false;
+        this.digProgress = 0;
+        this.ui.updateDigProgress(0);
     }
 
     update() {
