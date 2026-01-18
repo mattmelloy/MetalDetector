@@ -53,7 +53,7 @@ export const AREAS = [
     { id: 'park', name: 'City Park', cost: 500, theme: 'park', groundColor: 0x27ae60, available: ['copper', 'brass', 'silver'] },
     { id: 'farm', name: 'Farm Fields', cost: 2500, theme: 'farm', groundColor: 0x8b4513, available: ['brass', 'silver', 'gold', 'platinum'] },
     { id: 'ruins', name: 'Ancient Ruins', cost: 10000, theme: 'ruins', groundColor: 0xbdc3c7, available: ['silver', 'gold', 'platinum', 'palladium', 'rhodium'] },
-    { id: 'cemetery', name: 'Haunted Cemetery', cost: 50000, theme: 'cemetery', groundColor: 0x2c3e50, available: ['gold', 'platinum', 'palladium', 'rhodium', 'meteorite', 'unobtainium'] }
+    { id: 'cemetery', name: 'Haunted Cemetery', cost: 50000, theme: 'cemetery', groundColor: 0x2c3e50, available: ['platinum', 'palladium', 'rhodium', 'meteorite', 'unobtainium'] }
 ];
 
 // Helper to get metal by ID
