@@ -32,6 +32,11 @@ export class GameManager {
         // Keys
         this.keys = {};
 
+        // Mobile touch digging state
+        this.touchStartTime = 0;
+        this.touchStartPosition = { x: 0, y: 0 };
+        this.touchIsStationary = true;
+
         this.init();
     }
 
@@ -72,8 +77,9 @@ export class GameManager {
         window.addEventListener('keydown', (e) => this.onKeyDown(e));
         window.addEventListener('keyup', (e) => this.onKeyUp(e));
 
-        // Touch listeners for mobile digging
-        window.addEventListener('touchstart', (e) => this.onTouchStart(e));
+        // Touch listeners for mobile digging - touchstart on canvas to avoid blocking UI
+        this.scene.canvas.addEventListener('touchstart', (e) => this.onTouchStart(e));
+        this.scene.canvas.addEventListener('touchmove', (e) => this.onTouchMove(e));
         window.addEventListener('touchend', (e) => this.onTouchEnd(e));
         window.addEventListener('touchcancel', (e) => this.onTouchEnd(e));
 
@@ -126,8 +132,26 @@ export class GameManager {
 
     // Touch handlers for mobile digging
     onTouchStart(e) {
-        // Simulate space bar press for digging
-        this.keys['Space'] = true;
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            this.touchStartTime = Date.now();
+            this.touchStartPosition = { x: touch.clientX, y: touch.clientY };
+            this.touchIsStationary = true;
+        }
+    }
+
+    onTouchMove(e) {
+        if (e.touches.length > 0) {
+            const touch = e.touches[0];
+            const dx = Math.abs(touch.clientX - this.touchStartPosition.x);
+            const dy = Math.abs(touch.clientY - this.touchStartPosition.y);
+
+            // If moved more than 20px, it's a "move" not a "dig hold"
+            if (dx > 20 || dy > 20) {
+                this.touchIsStationary = false;
+                this.keys['Space'] = false;
+            }
+        }
     }
 
     onTouchEnd(e) {
@@ -136,9 +160,18 @@ export class GameManager {
         this.isDigging = false;
         this.digProgress = 0;
         this.ui.updateDigProgress(0);
+        this.touchStartTime = 0;
     }
 
     update() {
+        // Handle mobile digging hold delay
+        if (this.touchStartTime > 0 && this.touchIsStationary) {
+            const heldDuration = Date.now() - this.touchStartTime;
+            if (heldDuration > 350) {
+                this.keys['Space'] = true;
+            }
+        }
+
         // Update detector position from mouse
         const worldPos = this.scene.getMouseWorldPosition();
         if (worldPos) {

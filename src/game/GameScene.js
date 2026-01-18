@@ -66,9 +66,9 @@ export class GameScene {
         window.addEventListener('resize', () => this.onResize());
         window.addEventListener('mousemove', (e) => this.onMouseMove(e));
 
-        // Touch support for mobile/tablet
-        window.addEventListener('touchstart', (e) => this.onTouchMove(e), { passive: false });
-        window.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
+        // Touch support for mobile/tablet - Bound to canvas to allow UI interactions
+        this.canvas.addEventListener('touchstart', (e) => this.onTouchMove(e), { passive: false });
+        this.canvas.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
     }
 
     setupLighting() {
