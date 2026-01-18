@@ -1,25 +1,49 @@
 // Item Generator - Creates random items with rarity and variants
 
-import { METALS, VARIANTS } from './metals.js';
+import { METALS, VARIANTS, getAreaById } from './metals.js';
 
 export class ItemGenerator {
-    constructor(detectorLevel = 1, rarityBonus = 0) {
+    constructor(detectorLevel = 1, rarityBonus = 0, currentArea = 'beach') {
         this.detectorLevel = detectorLevel;
         this.rarityBonus = rarityBonus;
+        this.currentArea = currentArea;
     }
 
-    setDetectorLevel(level, rarityBonus) {
+    setDetectorLevel(level, rarityBonus, currentArea = 'beach') {
         this.detectorLevel = level;
         this.rarityBonus = rarityBonus;
+        this.currentArea = currentArea;
     }
 
     // Generate a random metal based on spawn rates
     generateMetal() {
-        // Filter metals that can be detected with current detector
-        const availableMetals = METALS.filter(m => m.minDetector <= this.detectorLevel);
+        // Get current area's available metals
+        const area = getAreaById(this.currentArea);
+        const allowedMetalIds = area ? area.available : ['aluminum', 'copper'];
 
+        // Filter valid metals that:
+        // 1. Are in the area's allowed list
+        // 2. Can be detected with current detector
+        let availableMetals = METALS.filter(m =>
+            allowedMetalIds.includes(m.id) &&
+            m.minDetector <= this.detectorLevel
+        );
+
+        // Fallback Logic:
+        // If no metals found (e.g. detector too low for area), 
+        // fallback to the easiest metal allowed in this area
         if (availableMetals.length === 0) {
-            return METALS[0]; // Fallback to aluminum
+            // Find the lowest tier metal allowed in this area
+            const lowestTierMetal = METALS
+                .filter(m => allowedMetalIds.includes(m.id))
+                .sort((a, b) => a.tier - b.tier)[0];
+
+            if (lowestTierMetal) {
+                return lowestTierMetal;
+            } else {
+                // Absolute fallback if something is wrong with data
+                return METALS[0];
+            }
         }
 
         // Apply rarity bonus to spawn rates
@@ -44,7 +68,7 @@ export class ItemGenerator {
             }
         }
 
-        return METALS[0]; // Fallback
+        return METALS.find(m => m.id === normalizedMetals[0].id) || METALS[0];
     }
 
     // Generate variants for an item (can have multiple!)
@@ -135,6 +159,6 @@ export function getItemGenerator() {
     return generatorInstance;
 }
 
-export function updateGeneratorSettings(detectorLevel, rarityBonus) {
-    getItemGenerator().setDetectorLevel(detectorLevel, rarityBonus);
+export function updateGeneratorSettings(detectorLevel, rarityBonus, currentArea = 'beach') {
+    getItemGenerator().setDetectorLevel(detectorLevel, rarityBonus, currentArea);
 }

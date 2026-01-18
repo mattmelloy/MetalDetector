@@ -49,11 +49,11 @@ export const BAGS = [
 ];
 
 export const AREAS = [
-    { id: 'beach', name: 'Starter Beach', cost: 0, theme: 'beach', groundColor: 0xf4d03f, exclusive: ['aluminum', 'copper'] },
-    { id: 'park', name: 'City Park', cost: 500, theme: 'park', groundColor: 0x27ae60, exclusive: ['brass', 'silver'] },
-    { id: 'farm', name: 'Farm Fields', cost: 2500, theme: 'farm', groundColor: 0x8b4513, exclusive: ['gold'] },
-    { id: 'ruins', name: 'Ancient Ruins', cost: 10000, theme: 'ruins', groundColor: 0xbdc3c7, exclusive: ['platinum', 'palladium'] },
-    { id: 'cemetery', name: 'Haunted Cemetery', cost: 50000, theme: 'cemetery', groundColor: 0x2c3e50, exclusive: ['rhodium', 'meteorite'] }
+    { id: 'beach', name: 'Starter Beach', cost: 0, theme: 'beach', groundColor: 0xf4d03f, available: ['aluminum', 'copper'] },
+    { id: 'park', name: 'City Park', cost: 500, theme: 'park', groundColor: 0x27ae60, available: ['copper', 'brass', 'silver'] },
+    { id: 'farm', name: 'Farm Fields', cost: 2500, theme: 'farm', groundColor: 0x8b4513, available: ['brass', 'silver', 'gold', 'platinum'] },
+    { id: 'ruins', name: 'Ancient Ruins', cost: 10000, theme: 'ruins', groundColor: 0xbdc3c7, available: ['silver', 'gold', 'platinum', 'palladium', 'rhodium'] },
+    { id: 'cemetery', name: 'Haunted Cemetery', cost: 50000, theme: 'cemetery', groundColor: 0x2c3e50, available: ['gold', 'platinum', 'palladium', 'rhodium', 'meteorite', 'unobtainium'] }
 ];
 
 // Helper to get metal by ID
@@ -65,6 +65,12 @@ export function getMetalById(id) {
 export function getVariantById(id) {
     return VARIANTS.find(v => v.id === id);
 }
+
+// Helper to get area by ID
+export function getAreaById(id) {
+    return AREAS.find(a => a.id === id);
+}
+
 
 // Helper to get rarity color based on tier
 export function getRarityColor(tier) {

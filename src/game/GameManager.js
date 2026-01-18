@@ -2,7 +2,7 @@
 
 import { DETECTORS, BAGS, AREAS, formatNumber } from '../data/metals.js';
 import { loadGame, saveGame } from '../data/save.js';
-import { ItemGenerator, updateGeneratorSettings } from '../data/itemGenerator.js';
+import { getItemGenerator, updateGeneratorSettings } from '../data/itemGenerator.js';
 import { getUI } from '../ui/UIManager.js';
 import { getAudio } from '../audio/AudioManager.js';
 
@@ -14,7 +14,7 @@ export class GameManager {
 
         // Game state
         this.state = loadGame();
-        this.itemGenerator = new ItemGenerator();
+        this.itemGenerator = getItemGenerator();
 
         // Detection state
         this.currentSignal = 0;
@@ -36,9 +36,10 @@ export class GameManager {
     }
 
     init() {
-        // Update generator with current detector level
+        // Update generator with current detector level and area
         const detector = this.getCurrentDetector();
-        updateGeneratorSettings(detector.level, detector.rarityBonus);
+        const currentArea = this.state.currentArea || 'beach';
+        updateGeneratorSettings(detector.level, detector.rarityBonus, currentArea);
 
         // Initialize UI
         this.ui.init({
@@ -385,13 +386,18 @@ export class GameManager {
         if (category === 'detectors') {
             this.state.detectorLevel = item.level;
             const detector = this.getCurrentDetector();
-            updateGeneratorSettings(detector.level, detector.rarityBonus);
+            updateGeneratorSettings(detector.level, detector.rarityBonus, this.state.currentArea);
         } else if (category === 'bags') {
             this.state.bagLevel = item.level;
         } else if (category === 'areas') {
             this.state.unlockedAreas.push(item.id);
             // Auto-switch to new area
             this.state.currentArea = item.id;
+
+            // Update generator with new area
+            const detector = this.getCurrentDetector();
+            updateGeneratorSettings(detector.level, detector.rarityBonus, item.id);
+
             this.scene.loadArea(item.theme, item.groundColor);
             this.spawnItems(); // Respawn with new area exclusives
         }
