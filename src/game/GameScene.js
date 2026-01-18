@@ -65,6 +65,10 @@ export class GameScene {
         // Event listeners
         window.addEventListener('resize', () => this.onResize());
         window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+
+        // Touch support for mobile/tablet
+        window.addEventListener('touchstart', (e) => this.onTouchMove(e), { passive: false });
+        window.addEventListener('touchmove', (e) => this.onTouchMove(e), { passive: false });
     }
 
     setupLighting() {
@@ -563,6 +567,15 @@ export class GameScene {
     onMouseMove(event) {
         this.mouse.x = (event.clientX / this.width) * 2 - 1;
         this.mouse.y = -(event.clientY / this.height) * 2 + 1;
+    }
+
+    onTouchMove(event) {
+        event.preventDefault(); // Prevent scrolling
+        if (event.touches.length > 0) {
+            const touch = event.touches[0];
+            this.mouse.x = (touch.clientX / this.width) * 2 - 1;
+            this.mouse.y = -(touch.clientY / this.height) * 2 + 1;
+        }
     }
 
     onResize() {
